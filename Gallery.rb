@@ -40,7 +40,39 @@ end
 
 def sortImages(images, dir=".", sortMode=SortMode::None)
     #todo: sort images by various modes 
-    return
+    case sortMode
+        when SortMode::None
+            return images
+        when SortMode::Alpha
+            return images.sort
+        when SortMode::DescAlpha
+            return images.sort { |x,y| y <=> x }
+        when SortMode::Modified
+            return images.sort do |x,y|
+                fx = File.new("#{dir}/#{x}","r")
+                fy = File.new("#{dir}/#{y}","r")
+                fx.stat <=> fy.stat
+            end
+        when SortMode::DescModified
+            return images.sort do |x,y|
+                fx = File.new("#{dir}/#{x}","r")
+                fy = File.new("#{dir}/#{y}","r")
+                fy.stat <=> fx.stat
+            end
+        when SortMode::Size
+            return images.sort do |x,y|
+                fx = File.new("#{dir}/#{x}","r")
+                fy = File.new("#{dir}/#{y}","r")
+                fx.stat.size <=> fy.stat.size
+            end
+        when SortMode::DescSize
+            return images.sort do |x,y|
+                fx = File.new("#{dir}/#{x}","r")
+                fy = File.new("#{dir}/#{y}","r")
+                fy.stat.size <=> fx.stat.size
+            end 
+
+    end
 end
 
 def MakeThumbs(images)
@@ -56,6 +88,7 @@ get '/' do
     if $tillrefesh == 0
         $tillrefresh = settings.image_refresh
         $images = getImages()
+
     else
         $tillrefresh = $tillrefresh - 1
     end
