@@ -117,7 +117,30 @@ get '/view/:image' do
                                      :next => $images[nextimg], 
                                      :imagedir => settings.image_directory }
     else 
-
+        halt 404
     end
 end 
 
+not_found do
+    saferequest = {
+        "accept" => request.accept,
+        "body" => request.body,
+        "scheme" => request.scheme,
+        "script_name" => request.script_name,
+        "path_info" => request.path_info,
+        "port" => request.port,
+        "request_method" => request.request_method,
+        "query_string" => request.query_string,
+        "content_length" => request.content_length,
+        "media_type" => request.media_type,
+        "host" => request.host,
+        "referrer" => request.referrer,
+        "user_agent" => request.user_agent,
+        "cookies" => request.cookies,
+        "url" => request.url,
+        "path" => request.path,
+        "ip" => request.ip,
+        "env" => request.env                 
+    }
+    liquid :error404, :locals => { :request => saferequest }
+end
