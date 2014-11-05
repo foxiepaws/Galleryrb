@@ -12,9 +12,9 @@ require 'liquid'
 configure :development do
     set :public_folder, "/home/olivia/code/galleryrb/test"
     set :views,         "/home/olivia/code/galleryrb/views"
-    set :image_refresh, 100
+    set :image_refresh, 10
     set :image_directory, "full/"
-    set :thumbnail_directory, "full/"
+    set :thumbnail_directory, "thumbs/"
 end
 configure :production do
     set :public_folder, "/home/olivia/code/galleryrb/test"
@@ -82,12 +82,17 @@ def sortImages(images, dir=".", sortMode=SortMode::None)
     end
 end
 
-def MakeThumbs(images)
-    #todo: go though the images array and create thumbnails
-    return
+def makeThumbs(images)
+    dir = "#{settings.public_folder}/#{settings.thumbnail_directory}"
+    images.each do |x|
+        unless File.exists?("#{dir}/#{x}") then
+            `convert #{settings.public_folder}/#{settings.image_directory}/#{x} -thumbnail 260x180 #{settings.public_folder}/#{settings.thumbnail_directory}/#{x}`
+        end
+    end
 end
 
 $images = getImages()
+makeThumbs($images)
 $tillrefresh = settings.image_refresh
 
 get '/' do
@@ -95,7 +100,7 @@ get '/' do
     if $tillrefesh == 0
         $tillrefresh = settings.image_refresh
         $images = getImages()
-
+        makeThumbs($images)
     else
         $tillrefresh = $tillrefresh - 1
     end
