@@ -9,9 +9,15 @@
 require 'sinatra'
 require 'liquid' 
 
-configure do
+configure :development do
     set :public_folder, "/home/olivia/code/galleryrb/test"
     set :views,         "/home/olivia/code/galleryrb/views"
+    set :image_refresh, 100
+end
+configure :production do
+    set :public_folder, "/home/olivia/code/galleryrb/test"
+    set :views,         "/home/olivia/code/galleryrb/views"
+    set :image_refresh, 5000
 end
 $imgdir  = "full/"
 $thmdir  = "thumbs/"
@@ -43,23 +49,25 @@ def MakeThumbs(images)
 end
 
 $images = getImages()
-$tillrefresh = 100
+$tillrefresh = settings.image_refresh
 
 get '/' do
     #todo: create our nice index page
     if $tillrefesh == 0
-        $tillrefresh = 100
+        $tillrefresh = settings.image_refresh
         $images = getImages()
     else
         $tillrefresh = $tillrefresh - 1
     end
-    liquid :index, :locals => { :test => $images }
+    liquid :index, :locals => { :images => $images }
 end
 
 get '/view/:image' do
-    #todo: show a single image page, with previous/next stuff.
     if $images.member?(params[:image]) 
-        liquid :single, :locals => { :image => params[:image] }
+        indexof = $images.index(params[:image])
+        prev = indexof - 1
+        if (indexof+1 > $images.length - 1) then nextimg = 0 else nextimg = indexof + 1 end
+        liquid :single, :locals => { :image => params[:image], :prev => $images[prev], :next => $images[nextimg] }
     else 
 
     end
