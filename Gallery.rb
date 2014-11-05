@@ -83,6 +83,7 @@ def sortImages(images, dir=".", sortMode=SortMode::None)
 end
 
 def makeThumbs(images)
+    #todo: switch to a library instead of this hack.
     dir = "#{settings.public_folder}/#{settings.thumbnail_directory}"
     images.each do |x|
         unless File.exists?("#{dir}/#{x}") then
@@ -96,7 +97,6 @@ makeThumbs($images)
 $tillrefresh = settings.image_refresh
 
 get '/' do
-    #todo: create our nice index page
     if $tillrefesh == 0
         $tillrefresh = settings.image_refresh
         $images = getImages()
