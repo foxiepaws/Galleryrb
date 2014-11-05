@@ -13,14 +13,16 @@ configure :development do
     set :public_folder, "/home/olivia/code/galleryrb/test"
     set :views,         "/home/olivia/code/galleryrb/views"
     set :image_refresh, 100
+    set :image_directory, "full/"
+    set :thumbnail_directory, "full/"
 end
 configure :production do
     set :public_folder, "/home/olivia/code/galleryrb/test"
     set :views,         "/home/olivia/code/galleryrb/views"
     set :image_refresh, 5000
+    set :image_directory, "full/"
+    set :thumbnail_directory, "thumbs/"
 end
-$imgdir  = "full/"
-$thmdir  = "thumbs/"
 
 module SortMode
     None         = 0
@@ -38,7 +40,7 @@ module SortMode
 end
 
 def getImages()
-    dir = "#{settings.public_folder}/#{$imgdir}"
+    dir = "#{settings.public_folder}/#{settings.image_directory}"
     Dir.chdir(dir) do
         images =  Dir["*.{jp{e,}g,gif,png}"]
         return sortImages(images,dir,SortMode::Newest)
@@ -82,7 +84,6 @@ end
 
 def MakeThumbs(images)
     #todo: go though the images array and create thumbnails
-    
     return
 end
 
@@ -98,15 +99,23 @@ get '/' do
     else
         $tillrefresh = $tillrefresh - 1
     end
-    liquid :index, :locals => { :images => $images }
+    liquid :index, :locals => { :images => $images, 
+                                :thumbdir => settings.thumbnail_directory }
 end
 
 get '/view/:image' do
     if $images.member?(params[:image]) 
         indexof = $images.index(params[:image])
         prev = indexof - 1
-        if (indexof+1 > $images.length - 1) then nextimg = 0 else nextimg = indexof + 1 end
-        liquid :single, :locals => { :image => params[:image], :prev => $images[prev], :next => $images[nextimg] }
+        if (indexof+1 > $images.length - 1) then 
+            nextimg = 0 
+        else 
+            nextimg = indexof + 1 
+        end
+        liquid :single, :locals => { :image => params[:image],
+                                     :prev => $images[prev], 
+                                     :next => $images[nextimg], 
+                                     :imagedir => settings.image_directory }
     else 
 
     end
