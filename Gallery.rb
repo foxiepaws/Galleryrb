@@ -7,14 +7,14 @@
 # Copyright 2014 Olivia Theze
 
 require 'sinatra'
+require 'liquid' 
 
 configure do
     set :public_folder, "/home/olivia/code/galleryrb/test"
     set :views,         "/home/olivia/code/galleryrb/views"
 end
-@imgdir  = "full/"
-@thmdir  = "thumbs/"
-
+$imgdir  = "full/"
+$thmdir  = "thumbs/"
 
 module SortMode
     None        = 0
@@ -27,11 +27,12 @@ module SortMode
 end
 
 def getImages()
-    #todo: get images from fulldir.
-    return
+    Dir.chdir("#{settings.public_folder}/#{$imgdir}") do
+        return Dir["*.{jp{e,}g,gif,png}"]
+    end
 end
 
-def sortImages(images, dir=".", sortMode=Gallery::SortMode::None)
+def sortImages(images, dir=".", sortMode=SortMode::None)
     #todo: sort images by various modes 
     return
 end
@@ -41,14 +42,26 @@ def MakeThumbs(images)
     return
 end
 
+$images = getImages()
+$tillrefresh = 100
+
 get '/' do
     #todo: create our nice index page
-    liquid :index, :locals => { :test => 'Olivia' }
+    if $tillrefesh == 0
+        $tillrefresh = 100
+        $images = getImages()
+    else
+        $tillrefresh = $tillrefresh - 1
+    end
+    liquid :index, :locals => { :test => $images }
 end
 
-
 get '/view/:image' do
-    #todo: show a single image
+    #todo: show a single image page, with previous/next stuff.
+    if $images.member?(params[:image]) 
+        liquid :single, :locals => { :image => params[:image] }
+    else 
 
+    end
 end 
 
