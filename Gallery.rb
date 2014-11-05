@@ -23,23 +23,29 @@ $imgdir  = "full/"
 $thmdir  = "thumbs/"
 
 module SortMode
-    None        = 0
-    Alpha       = 1
-    Modified    = 2
-    Size        = 3
-    DescAlpha   = 4
-    DescModifed = 5
-    DescSize    = 6
+    None         = 0
+    Alpha        = 1
+    Modified     = 2
+    Size         = 3
+    DescAlpha    = 4
+    DescModified = 5
+    DescSize     = 6
+# some aliases.
+    Newest       = 5
+    Oldest       = 2
+    Biggest      = 6
+    Smallest     = 3
 end
 
 def getImages()
-    Dir.chdir("#{settings.public_folder}/#{$imgdir}") do
-        return Dir["*.{jp{e,}g,gif,png}"]
+    dir = "#{settings.public_folder}/#{$imgdir}"
+    Dir.chdir(dir) do
+        images =  Dir["*.{jp{e,}g,gif,png}"]
+        return sortImages(images,dir,SortMode::Newest)
     end
 end
 
 def sortImages(images, dir=".", sortMode=SortMode::None)
-    #todo: sort images by various modes 
     case sortMode
         when SortMode::None
             return images
@@ -71,12 +77,12 @@ def sortImages(images, dir=".", sortMode=SortMode::None)
                 fy = File.new("#{dir}/#{y}","r")
                 fy.stat.size <=> fx.stat.size
             end 
-
     end
 end
 
 def MakeThumbs(images)
     #todo: go though the images array and create thumbnails
+    
     return
 end
 
