@@ -108,11 +108,7 @@ get '/view/:image' do
     if $images.member?(params[:image]) 
         indexof = $images.index(params[:image])
         prev = indexof - 1
-        if (indexof+1 > $images.length - 1) then 
-            nextimg = 0 
-        else 
-            nextimg = indexof + 1 
-        end
+        nextimg = (indexof+1 > $images.length - 1) ? 0 : indexof + 1
         liquid :single, :locals => { :image => params[:image],
                                      :prev => $images[prev], 
                                      :next => $images[nextimg], 
