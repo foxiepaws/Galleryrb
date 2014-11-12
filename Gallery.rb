@@ -48,37 +48,33 @@ def getImages()
 end
 
 def sortImages(images, dir=".", sortMode=SortMode::None)
+
+    make_file = lambda do |f|
+        return File.new("#{dir}/#{f}","r")
+    end
     case sortMode
         when SortMode::None
             return images
         when SortMode::Alpha
             return images.sort
         when SortMode::DescAlpha
-            return images.sort { |x,y| y <=> x }
+            return sortImages(images,dir,SortMode::Alpha).reverse
         when SortMode::Modified
             return images.sort do |x,y|
-                fx = File.new("#{dir}/#{x}","r")
-                fy = File.new("#{dir}/#{y}","r")
+                fx = make_file.(x)
+                fy = make_file.(y)
                 fx.stat <=> fy.stat
             end
         when SortMode::DescModified
-            return images.sort do |x,y|
-                fx = File.new("#{dir}/#{x}","r")
-                fy = File.new("#{dir}/#{y}","r")
-                fy.stat <=> fx.stat
-            end
+            return sortImages(images,dir,SortMode::Modified).reverse
         when SortMode::Size
             return images.sort do |x,y|
-                fx = File.new("#{dir}/#{x}","r")
-                fy = File.new("#{dir}/#{y}","r")
+                fx = make_file.(x)
+                fy = make_file.(y)
                 fx.stat.size <=> fy.stat.size
             end
         when SortMode::DescSize
-            return images.sort do |x,y|
-                fx = File.new("#{dir}/#{x}","r")
-                fy = File.new("#{dir}/#{y}","r")
-                fy.stat.size <=> fx.stat.size
-            end 
+            return sortImages(images,dir,SortMode::Size).reverse
     end
 end
 
